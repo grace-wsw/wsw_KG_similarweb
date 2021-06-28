@@ -14,7 +14,7 @@ from dateutil.relativedelta import relativedelta, MO
 
 def app():
     password = st.text_input('Enter the password to continue')
-    if password == 'Weber2021!':
+    if password == st.secrets["PASSWORD"]:
     #create template
 
     #template = pd.DataFrame(columns=["Link","Date"])
@@ -65,7 +65,7 @@ def app():
                     try:
                         if str(i[1].strftime("%Y-%m"))==this_month:
                             start_date=str((i[1]-relativedelta(months=1)).strftime("%Y-%m"))
-                            payload = {'api_key': '3e7ff4bd3903428bb1e5e40c88214bbe', 
+                            payload = {'api_key': st.secrets["SIMILARWEB_API_KEY"], 
                                    'start_date': start_date, 
                                    'end_date': start_date, 
                                    'country': 'US', 

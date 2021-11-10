@@ -79,7 +79,7 @@ def app():
                         else:
                             start_date=str(i[1].strftime("%Y-%m"))
                             end_date=str(i[1].strftime("%Y-%m"))
-                            payload = {'api_key': '3e7ff4bd3903428bb1e5e40c88214bbe', 
+                            payload = {'api_key': 'st.secrets["SIMILARWEB_API_KEY"], 
                                    'start_date': start_date, 
                                    'end_date': end_date, 
                                    'country': 'US', 

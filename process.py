@@ -37,10 +37,10 @@ def app():
         )
 
 
-        if genre1 !='impression by month' or genre2 != 'Desktop' :
+        if genre1 !='impression by month (monthly unique visitors)' or genre2 != 'Desktop' :
             st.write("Sorry, current selection is unavailable at this time")
 
-        if genre1 == 'impression by month' and genre2 == 'Desktop':
+        if genre1 == 'impression by month (monthly unique visitors)' and genre2 == 'Desktop':
             uploadedfile = st.file_uploader(
                 "File Uploader", accept_multiple_files=False
             )

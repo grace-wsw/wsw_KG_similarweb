@@ -28,7 +28,7 @@ def app():
         st.title("SimilarWeb automation \n")
         st.header("Please use below header for your list: \n")
         st.dataframe(template)
-        genre1 = st.radio("what's your target metric?",("impression by month","website ranking"))
+        genre1 = st.radio("what's your target metric?",("impression by month (monthly unique visitors)","website ranking"))
         genre2 = st.radio("what's your target traffic?",("Desktop","Mobile"))
         st.header("Upload File (only one at a time): \n")
         st.text(
@@ -72,9 +72,9 @@ def app():
                                    'granularity': 'monthly', 
                                    'main_domain_only': 'false', 
                                    'format': 'json'}
-                            url= 'https://api.similarweb.com/v1/website/'+i[0]+'/traffic-and-engagement/visits'
+                            url= 'https://api.similarweb.com/v1/website/'+i[0]+'/unique-visitors/desktop_unique_visitors'
                             r=requests.get(url,params=payload)
-                            impression= r.json()['visits'][0]['visits']
+                            impression= r.json()['unique_visitors'][0]['unique_visitors']
                             impression_dic.update({tuple(i):impression})
                         else:
                             start_date=str(i[1].strftime("%Y-%m"))
@@ -86,9 +86,9 @@ def app():
                                    'granularity': 'monthly', 
                                    'main_domain_only': 'false', 
                                    'format': 'json'}
-                            url= 'https://api.similarweb.com/v1/website/'+i[0]+'/traffic-and-engagement/visits'
+                            url= 'https://api.similarweb.com/v1/website/'+i[0]+'/unique-visitors/desktop_unique_visitors'
                             r=requests.get(url,params=payload)
-                            impression_dic.update({tuple(i):r.json()['visits'][0]['visits']})
+                            impression_dic.update({tuple(i):r.json()['unique_visitors'][0]['unique_visitors']})
                     except:
                         impression='error code 401, data not found'
                         impression_dic.update({tuple(i):impression})

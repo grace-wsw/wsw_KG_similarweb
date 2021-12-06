@@ -1,6 +1,9 @@
 #import re
 import pandas as pd
-from datetime import date 
+from datetime import date
+from datetime import datetime
+import requests
+from dateutil.relativedelta import relativedelta, MO 
 import base64
 import os
 from io import BytesIO
@@ -67,3 +70,95 @@ def download_link(object_to_download, download_filename, download_link_text):
     b64 = base64.b64encode(object_to_download.encode("utf-8")).decode()
 
     return f'<a href="data:file/txt;base64,{b64}" download="{download_filename}">{download_link_text}</a>'
+
+def get_desktop_traffic(df):
+    lookup_dict = [x for x in df['key']]
+    lookup_dict = [tuple(item) for item in lookup_dict]
+    lookup_dict = list(set(lookup_dict))
+    lookup_dict = [list(item) for item in lookup_dict]
+
+    this_month = datetime.date(datetime.now()).strftime("%Y-%m")
+    save_date = datetime.strftime(datetime.now(),'%Y-%m-%d')
+    impression_dic = {}
+    for i in lookup_dict:
+        try:
+            if str(i[1].strftime("%Y-%m"))==this_month:
+                start_date=str((i[1]-relativedelta(months=1)).strftime("%Y-%m"))
+                payload = {'api_key': st.secrets["SIMILARWEB_API_KEY"], 
+                       'start_date': start_date, 
+                       'end_date': start_date, 
+                       'country': 'US', 
+                       'granularity': 'monthly', 
+                       'main_domain_only': 'false', 
+                       'format': 'json'}
+                url= 'https://api.similarweb.com/v1/website/'+i[0]+'/unique-visitors/desktop_unique_visitors'
+                r=requests.get(url,params=payload)
+                impression= r.json()['unique_visitors'][0]['unique_visitors']
+                impression_dic.update({tuple(i):impression})
+            else:
+                start_date=str(i[1].strftime("%Y-%m"))
+                end_date=str(i[1].strftime("%Y-%m"))
+                payload = {'api_key': st.secrets["SIMILARWEB_API_KEY"],
+                       'start_date': start_date, 
+                       'end_date': end_date, 
+                       'country': 'US', 
+                       'granularity': 'monthly', 
+                       'main_domain_only': 'false', 
+                       'format': 'json'}
+                url= 'https://api.similarweb.com/v1/website/'+i[0]+'/unique-visitors/desktop_unique_visitors'
+                r=requests.get(url,params=payload)
+                impression_dic.update({tuple(i):r.json()['unique_visitors'][0]['unique_visitors']})
+        except:
+            impression='error code 401, data not found'
+            impression_dic.update({tuple(i):impression})
+    df['tuplekey'] = df['key'].apply(lambda x:tuple(x))
+    df['data_source_month']=df['Date'].apply(lambda x:'Previous Month'if x.strftime("%Y-%m")==this_month else x.strftime("%Y-%m") )        
+    df['SWMonthlyUniqueVisitors(US,Desktop)']=df['tuplekey'].apply(lambda x:impression_dic[x])
+    #df.drop(columns=['key','tuplekey'],inplace=True)
+    return df
+
+def get_mobile_traffic(df):
+    lookup_dict = [x for x in df['key']]
+    lookup_dict = [tuple(item) for item in lookup_dict]
+    lookup_dict = list(set(lookup_dict))
+    lookup_dict = [list(item) for item in lookup_dict]
+
+    this_month = datetime.date(datetime.now()).strftime("%Y-%m")
+    save_date = datetime.strftime(datetime.now(),'%Y-%m-%d')
+    impression_dic = {}
+    for i in lookup_dict:
+        try:
+            if str(i[1].strftime("%Y-%m"))==this_month:
+                start_date=str((i[1]-relativedelta(months=1)).strftime("%Y-%m"))
+                payload = {'api_key': st.secrets["SIMILARWEB_API_KEY"], 
+                       'start_date': start_date, 
+                       'end_date': start_date, 
+                       'country': 'US', 
+                       'granularity': 'monthly', 
+                       'main_domain_only': 'false', 
+                       'format': 'json'}
+                url= 'https://api.similarweb.com/v1/website/'+i[0]+'/unique-visitors/mobileweb_unique_visitors'
+                r=requests.get(url,params=payload)
+                impression= r.json()['unique_visitors'][0]['unique_visitors']
+                impression_dic.update({tuple(i):impression})
+            else:
+                start_date=str(i[1].strftime("%Y-%m"))
+                end_date=str(i[1].strftime("%Y-%m"))
+                payload = {'api_key': st.secrets["SIMILARWEB_API_KEY"], 
+                       'start_date': start_date, 
+                       'end_date': end_date, 
+                       'country': 'US', 
+                       'granularity': 'monthly', 
+                       'main_domain_only': 'false', 
+                       'format': 'json'}
+                url= 'https://api.similarweb.com/v1/website/'+i[0]+'/unique-visitors/mobileweb_unique_visitors'
+                r=requests.get(url,params=payload)
+                impression_dic.update({tuple(i):r.json()['unique_visitors'][0]['unique_visitors']})
+        except:
+            impression='error code 401, data not found'
+            impression_dic.update({tuple(i):impression})
+    df['tuplekey'] = df['key'].apply(lambda x:tuple(x))
+    df['data_source_month']=df['Date'].apply(lambda x:'Previous Month'if x.strftime("%Y-%m")==this_month else x.strftime("%Y-%m") )        
+    df['SWMonthlyUniqueVisitors(US,Mobile)']=df['tuplekey'].apply(lambda x:impression_dic[x])
+    #df.drop(columns=['key','tuplekey'],inplace=True)
+    return df

@@ -4,7 +4,7 @@ import instructions
 import process
 
 
-PAGES = {"Instructions": instructions,"Process": process}
+PAGES = {"Process": process}
 #"RFI Word Automation": AutomateWord,
 st.set_page_config(
   page_title="SimilarWeb Integration",
